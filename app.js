@@ -5,6 +5,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const db = require('./mongoose');
 
+// Passport setup
+const passport = require('passport');
+require('./config/passport')(passport);
+
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
 
@@ -16,6 +20,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
 app.options('*', cors());
+app.use(passport.initialize());
+app.use((req, res, next) => {
+  console.log('Received a new request with payload\n', JSON.stringify(req.body, undefined, 2));
+  next();
+});
 
 // Routes
 app.use('/', indexRouter);

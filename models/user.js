@@ -6,6 +6,11 @@ const userSchema = mongoose.Schema({
         required: true,
         minlength: 1
     },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6
+    },
     email: {
         type: String,
         required: true,
@@ -13,4 +18,4 @@ const userSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('UserModel', userSchema);
+module.exports = mongoose.model('User', userSchema);
