@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const logger = require('./config/winston');
+const logger = require('./config/logger');
 const db = require('./mongoose');
 
 // Passport setup
@@ -26,19 +26,13 @@ app.use(cookieParser());
 app.use(cors());
 app.options('*', cors());
 app.use(passport.initialize());
-app.use((req, res, next) => {
-  logger.info('Received a new request %s', "hello");
-  next();
-});
 
 // Routes
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
+app.use((req, res, next) => next(createError(404)));
 
 // error handler
 app.use(function (err, req, res, next) {
@@ -47,7 +41,7 @@ app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // add this line to include winston logging
-  winston.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 
   // render the error page
   res.status(err.status || 500);
