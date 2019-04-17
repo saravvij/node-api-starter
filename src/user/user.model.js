@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const brcypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 const UserSchema = mongoose.Schema({
     name: {
@@ -48,29 +47,5 @@ UserSchema.pre('save', async function (next) {
     //Indicates we're done and moves on to the next middleware
     next();
 });
-
-/**
- * Hashes the password sent by the user for login and checks if the hashed password stored in the 
- * database matches the one sent. Returns true if it does else false.
- */
-UserSchema.methods.isValidPassword = async function (password) {
-    const user = this;
-    const compare = await brcypt.compare(password, user.password)
-    return compare;
-}
-
-UserSchema.methods.generateAuthToken = async function () {
-    const user = this;
-    //We don't want to store the sensitive information such as the
-    //user password in the token so we pick only the email and id
-    //Sign the JWT token and populate the payload with the user email and id
-    const token = jwt.sign({
-        _id: user._id.toString(),
-        email: user.email
-    }, 'top_secret');
-
-    return token;
-
-}
 
 module.exports = mongoose.model('User', UserSchema);

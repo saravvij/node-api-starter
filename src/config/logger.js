@@ -18,7 +18,7 @@ const options = {
 
     default: {
         level: 'info',
-        format: format.json(),
+        format: format.simple(),
         defaultMeta: {
             service: 'user-service'
         }
@@ -30,7 +30,13 @@ const options = {
         handleExceptions: true,
         maxsize: 5242880, // 5MB
         maxFiles: 5,
-        colorize: false,
+        format: format.combine(
+            format.splat(),
+            format.timestamp({
+                format: 'YYYY-MM-DD HH:mm:ss'
+            }),
+            format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+        ),
     },
 
     errorFile: {
@@ -39,20 +45,19 @@ const options = {
         handleExceptions: true,
         maxsize: 5242880, // 5MB
         maxFiles: 5,
-        colorize: false,
     },
 
     console: {
         level: 'debug',
         handleExceptions: true,
         format: format.combine(
+            format.splat(),
             format.colorize(),
             format.timestamp({
                 format: 'YYYY-MM-DD HH:mm:ss'
             }),
             format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
         ),
-        colorize: true,
     },
 };
 
@@ -63,7 +68,7 @@ const options = {
 const logger = createLogger({
     level: options.default.level,
     defaultMeta: options.default.defaultMeta,
-    format: options.default.simple,
+    format: options.default.format,
     transports: [
         new transports.File(options.combinedFile),
         new transports.File(options.errorFile)

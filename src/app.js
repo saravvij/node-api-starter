@@ -1,17 +1,21 @@
+require('dotenv').config();
+const config = require('./config');
+const logger = require('./config/logger');
+const morgan = require('morgan');
 const createError = require('http-errors');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-const logger = require('./config/logger');
-const db = require('./mongoose');
+
+logger.info("Loaded environment = %s", config.get('env'));
+
+const db = require('./db');
 
 // Passport setup
 const passport = require('passport');
 require('./config/passport')(passport);
 
-const indexRouter = require('./routes/index');
-const userRouter = require('./routes/user');
+const userRouter = require('./user/user.router');
 
 const app = express();
 
@@ -28,8 +32,7 @@ app.options('*', cors());
 app.use(passport.initialize());
 
 // Routes
-app.use('/', indexRouter);
-app.use('/users', userRouter);
+app.use('/api/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => next(createError(404)));

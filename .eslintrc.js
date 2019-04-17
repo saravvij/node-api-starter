@@ -1,10 +1,15 @@
 module.exports = {
   env: {
-    browser: true,
+    browser: false,
     commonjs: true,
     es6: true,
   },
-  extends: ['prettier', 'airbnb-base'],
+  extends: [
+    'prettier',
+    'airbnb-base',
+    'plugin:promise/recommended',
+    'plugin:security/recommended'
+  ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -16,6 +21,8 @@ module.exports = {
     "prettier/prettier": ["error"]
   },
   plugins: [
-    'prettier'
+    'prettier',
+    'promise',
+    'security'
   ]
 };

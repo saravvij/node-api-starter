@@ -6,7 +6,8 @@ const config = convict({
         doc: "The application environment.",
         format: ["production", "test", "development", "local"],
         default: "local",
-        env: "NODE_ENV"
+        env: "NODE_ENV",
+        arg: "env"
     },
     ip: {
         doc: "The IP address to bind.",
@@ -59,12 +60,22 @@ const config = convict({
             env: "DB_PASSWORD",
             arg: "dbpassword"
         }
+    },
+    jwt: {
+        secret: {
+            doc: 'JWT Sign Secret Key',
+            formar: String,
+            sensitive: true,
+            default: '',
+            env: 'JWT_SECRET',
+            arg: 'jwtsecret'
+        }
     }
 });
 
 // Load environment dependent configuration
 const env = config.get('env');
-config.loadFile('./config/' + env + '.json');
+config.loadFile('./src/config/env/' + env + '.json');
 
 // Perform validation
 config.validate({
