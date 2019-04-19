@@ -6,8 +6,9 @@ const createError = require('http-errors');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const responseTime = require('response-time');
 
-logger.info("Loaded environment = %s", config.get('env'));
+logger.info('Loaded environment = %s', config.get('env'));
 
 const db = require('./db');
 
@@ -19,13 +20,18 @@ const userRouter = require('./user/user.router');
 
 const app = express();
 
-app.use(morgan('combined', {
-  stream: logger.stream
-}));
+app.use(responseTime());
+app.use(
+  morgan('combined', {
+    stream: logger.stream
+  })
+);
 app.use(express.json());
-app.use(express.urlencoded({
-  extended: false
-}));
+app.use(
+  express.urlencoded({
+    extended: false
+  })
+);
 app.use(cookieParser());
 app.use(cors());
 app.options('*', cors());
@@ -44,7 +50,9 @@ app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // add this line to include winston logging
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  logger.error(
+    `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
+  );
 
   // render the error page
   res.status(err.status || 500);

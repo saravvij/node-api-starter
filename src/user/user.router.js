@@ -6,16 +6,13 @@ const {
 } = require('./user.service');
 const router = express.Router();
 
-router.get('/greetings', (req, res) => res.send('Hello'));
 
-// Login user
-router.post('/login', async (req, res, next) => {
-  passport.authenticate('login', async (err, user, info) => {
+const handleAuth = async (req, res, next, type) => {
+  passport.authenticate(type, async (err, user, info) => {
     try {
       if (err || !user) {
-        logger.error(info);
-        return res.status(403).send({
-          'message': info.message
+        return res.status(400).send({
+          message: err ? err.message : type + ' is failed'
         });
       }
 
@@ -30,8 +27,11 @@ router.post('/login', async (req, res, next) => {
         // Generate Auth Token
         const token = await generateAuthToken(user);
 
+        const status = type === 'signup' ? 201 : 200;
+
         //Send back the token to the user
-        return res.json({
+        return res.status(status).json({
+          id: user._id,
           token
         });
       });
@@ -40,26 +40,9 @@ router.post('/login', async (req, res, next) => {
       return next(error);
     }
   })(req, res, next);
-});
+}
 
-//When the user sends a post request to this route, passport authenticates the user based on the
-//middleware created previously
-router.post('/signup', passport.authenticate('signup', {
-  session: false
-}), async (req, res, next) => {
-  // Generate Auth Token
-  const token = await generateAuthToken(req.user);
-  res.status(201)
-    .json({
-      message: 'Signup successful',
-      user: {
-        "_id": req.user._id,
-        "email": req.user.email
-      },
-      token
-    });
-});
-
-
+router.post('/login', (req, res, next) => handleAuth(req, res, next, 'login'));
+router.post('/signup', (req, res, next) => handleAuth(req, res, next, 'signup'));
 
 module.exports = router;

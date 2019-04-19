@@ -19,9 +19,13 @@ module.exports = (passport) => {
                 password
             });
             //Send the user information to the next middleware
-            return done(null, user);
+            return done(null, user, {
+                message: 'Signup Successful'
+            });
         } catch (error) {
-            done(error);
+            return done(error, false, {
+                message: error
+            });
         }
     }));
 
@@ -37,19 +41,18 @@ module.exports = (passport) => {
 
             if (!user) {
                 //If the user isn't found in the database, return a message
-                return done(null, false, {
+                return done({
                     message: 'User not found'
-                });
+                }, false, {});
             }
 
-            console.info("Found user: " + user);
             //Validate password and make sure it matches with the corresponding hash stored in the database
             //If the passwords match, it returns a value of true.
             const validate = await isValidPassword(user, password);
             if (!validate) {
-                return done(null, false, {
+                return done({
                     message: 'Wrong Password'
-                });
+                }, false, {});
             }
 
             //Send the user information to the next middleware
