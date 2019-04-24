@@ -1,10 +1,9 @@
 const express = require('express');
 const logger = require('../config/logger');
 const passport = require('passport');
-const {
-  generateAuthToken
-} = require('./user.service');
+const userService = require('./user.service');
 const router = express.Router();
+
 
 
 const handleAuth = async (req, res, next, type) => {
@@ -25,7 +24,7 @@ const handleAuth = async (req, res, next, type) => {
         }
 
         // Generate Auth Token
-        const token = await generateAuthToken(user);
+        const token = await userService.generateAuthToken(user);
 
         const status = type === 'signup' ? 201 : 200;
 

@@ -1,9 +1,5 @@
 const localStrategy = require('passport-local').Strategy;
-const {
-    createUser,
-    findUserByEmail,
-    isValidPassword
-} = require('../user/user.service');
+const userService = require('../user/user.service');
 const logger = require('./logger');
 
 module.exports = (passport) => {
@@ -14,7 +10,7 @@ module.exports = (passport) => {
     }, async (email, password, done) => {
         try {
             //Save the information provided by the user to the the database
-            const user = await createUser({
+            const user = await userService.createUser({
                 email,
                 password
             });
@@ -37,7 +33,7 @@ module.exports = (passport) => {
 
         try {
             //Find the user associated with the email provided by the user
-            const user = await findUserByEmail(email);
+            const user = await userService.findUserByEmail(email);
 
             if (!user) {
                 //If the user isn't found in the database, return a message
@@ -48,7 +44,7 @@ module.exports = (passport) => {
 
             //Validate password and make sure it matches with the corresponding hash stored in the database
             //If the passwords match, it returns a value of true.
-            const validate = await isValidPassword(user, password);
+            const validate = await userService.isValidPassword(user, password);
             if (!validate) {
                 return done({
                     message: 'Wrong Password'
