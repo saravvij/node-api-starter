@@ -18,7 +18,6 @@ const options = {
 
     default: {
         level: 'info',
-        format: format.simple(),
         defaultMeta: {
             service: 'user-service'
         }
@@ -30,13 +29,7 @@ const options = {
         handleExceptions: true,
         maxsize: 5242880, // 5MB
         maxFiles: 5,
-        format: format.combine(
-            format.splat(),
-            format.timestamp({
-                format: 'YYYY-MM-DD HH:mm:ss'
-            }),
-            format.simple(),
-        ),
+        format: format.combine(format.timestamp(), format.splat(), format.simple())
     },
 
     errorFile: {
@@ -45,19 +38,13 @@ const options = {
         handleExceptions: true,
         maxsize: 5242880, // 5MB
         maxFiles: 5,
+        format: format.combine(format.timestamp(), format.splat(), format.json())
     },
 
     console: {
         level: 'debug',
         handleExceptions: true,
-        format: format.combine(
-            format.splat(),
-            format.colorize(),
-            format.timestamp({
-                format: 'YYYY-MM-DD HH:mm:ss'
-            }),
-            format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-        ),
+        format: format.combine(format.colorize(), format.splat(), format.simple())
     },
 };
 

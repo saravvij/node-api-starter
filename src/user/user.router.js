@@ -2,6 +2,7 @@ const express = require('express');
 const logger = require('../config/logger');
 const passport = require('passport');
 const userService = require('./user.service');
+const createError = require('http-errors');
 const router = express.Router();
 
 
@@ -10,9 +11,7 @@ const handleAuth = async (req, res, next, type) => {
   passport.authenticate(type, async (err, user, info) => {
     try {
       if (err || !user) {
-        return res.status(400).send({
-          message: err ? err.message : type + ' is failed'
-        });
+        throw createError.BadRequest(err ? err.message : type + ' is failed');
       }
 
       req.login(user, {

@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser');
 const responseTime = require('response-time');
 
 logger.info('Loaded environment = %s', config.get('env'));
-
 const db = require('./db');
 
 // Passport setup
@@ -45,22 +44,29 @@ app.use((req, res, next) => next(createError(404)));
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // add this line to include winston logging
-  logger.error(
-    `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
-  );
-  logger.error(err);
+  const status = err.status || 500;
+  const message = err.message || 'Sorry!, System is unable to handle your request, Please try again.';
+  const timestamp = err.timestamp || new Date();
+  const path = req.path;
+  const error = {
+    status,
+    message,
+    timestamp,
+    path
+  }
+
+  logger.error(error);
 
   // render the error page
-  res.status(err.status || 500);
+  res.status(status);
   res.send({
-    status: err.status,
-    message: res.locals.message
+    status,
+    message,
+    timestamp,
+    path
   });
+  res.send(err);
 });
 
 module.exports = app;
